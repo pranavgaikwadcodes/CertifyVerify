@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
 import { Search, CheckCircle, XCircle, AlignCenterVertical as Certificate } from 'lucide-react';
 
-interface CertificateDetails {
-  courseTitle: string;
+interface BaseCertificateDetails {
+  type: 'course' | 'internship';
   completionDate: string;
   issuer: string;
 }
+
+interface CourseDetails extends BaseCertificateDetails {
+  type: 'course';
+  courseTitle: string;
+}
+
+interface InternshipDetails extends BaseCertificateDetails {
+  type: 'internship';
+  role: string;
+  duration: string;
+}
+
+type CertificateDetails = CourseDetails | InternshipDetails;
 
 interface VerificationResult {
   status: 'verified' | 'unverified' | null;
@@ -25,8 +38,20 @@ const VALID_CERTIFICATES: CertificateData[] = [
     email: 'Pardeshinakshatra@gmail.com',
     code: 'IXG672',
     details: {
+      type: 'course',      
       courseTitle: 'AI Fluency Bootcamp',
       completionDate: 'February 14, 2025',
+      issuer: 'Virtual Intern'
+    }
+  },
+  {
+    email: 'fatemapathari16@gmail.com',
+    code: 'HIAE65',
+    details: {
+      type: 'internship',
+      role: 'BACKEND WEB DEVELOPMENT',
+      duration: '6 months',
+      completionDate: 'October 10, 2025',
       issuer: 'Virtual Intern'
     }
   },
@@ -64,6 +89,42 @@ function App() {
     }
 
     setIsLoading(false);
+  };
+
+  const renderCertificateDetails = (details: CertificateDetails) => {
+    return (
+      <dl className="space-y-3">
+        <div>
+          <dt className="text-sm font-medium text-gray-500">Type</dt>
+          <dd className="text-sm text-gray-800 capitalize">{details.type} Certificate</dd>
+        </div>
+        {details.type === 'course' ? (
+          <div>
+            <dt className="text-sm font-medium text-gray-500">Course Title</dt>
+            <dd className="text-sm text-gray-800">{details.courseTitle}</dd>
+          </div>
+        ) : (
+          <>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Role</dt>
+              <dd className="text-sm text-gray-800">{details.role}</dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Duration</dt>
+              <dd className="text-sm text-gray-800">{details.duration}</dd>
+            </div>
+          </>
+        )}
+        <div>
+          <dt className="text-sm font-medium text-gray-500">Completion Date</dt>
+          <dd className="text-sm text-gray-800">{details.completionDate}</dd>
+        </div>
+        <div>
+          <dt className="text-sm font-medium text-gray-500">Issued By</dt>
+          <dd className="text-sm text-gray-800">{details.issuer}</dd>
+        </div>
+      </dl>
+    );
   };
 
   return (
@@ -148,20 +209,7 @@ function App() {
               {result.status === 'verified' && result.details && (
                 <div className="border-t border-green-100 bg-white p-4">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Certificate Details</h3>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Course Title</dt>
-                      <dd className="text-sm text-gray-800">{result.details.courseTitle}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Completion Date</dt>
-                      <dd className="text-sm text-gray-800">{result.details.completionDate}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Issued By</dt>
-                      <dd className="text-sm text-gray-800">{result.details.issuer}</dd>
-                    </div>
-                  </dl>
+                  {renderCertificateDetails(result.details)}
                 </div>
               )}
             </div>
